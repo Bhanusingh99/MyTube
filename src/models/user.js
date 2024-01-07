@@ -49,6 +49,7 @@ const userShema = new Schema(
   { timestamps: true }
 );
 
+// Purpose: Safeguard password storage by hashing passwords before saving them to the database.
 userShema.pre("save", async function (next) {
   if (!this.isModified("Password")) return next();
 
@@ -56,10 +57,12 @@ userShema.pre("save", async function (next) {
   next();
 });
 
+// Purpose: Verify user-provided passwords against stored hashed passwords during authentication.
 userShema.methods.isPasswordCorrect = async function (Password) {
   return await bcrypt.compare(Password, this.Password);
 };
 
+//Purpose: Generate access tokens for authenticated users to access protected resources.
 userShema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
